@@ -14,6 +14,7 @@
 #include "gpu.h"
 #include "memory.h"
 #include "timing.hpp"
+#include "fcat.h"
 #include "mesa/util/macros.h"
 #include "battery.h"
 #include "string_utils.h"
@@ -48,6 +49,7 @@ bool gpu_metrics_exists = false;
 bool steam_focused = false;
 vector<float> frametime_data(200,0.f);
 int fan_speed;
+fcatoverlay fcatstatus;
 
 void init_spdlog()
 {
@@ -551,6 +553,49 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
       if((now - logger->last_log_end()) < 12s && !logger->is_active())
          render_benchmark(data, params, window_size, height, now);
    }
+   
+   if(fcatstatus.is_active)
+     {
+       auto main_window_pos = ImVec2(0,0);
+       auto window_size = ImVec2(24,ImGui::GetIO().DisplaySize.y);
+       auto p_min = ImVec2(0.,0.);
+       auto p_max = ImVec2(window_size.x,ImGui::GetIO().DisplaySize.y);
+      //Switch the used screen edge, this enables capture from devices with any screen orientation.
+      //This goes counter-clockwise from the left edge (0) 
+       switch (fcatstatus.landscape_orientation)
+         {
+         default:
+         case 0:
+           break;
+         case 1:
+           window_size = ImVec2(ImGui::GetIO().DisplaySize.x,window_size.x);
+           p_min = ImVec2(0,ImGui::GetIO().DisplaySize.y - window_size.y);
+           main_window_pos=p_min;
+           p_max = ImVec2(ImGui::GetIO().DisplaySize.x,ImGui::GetIO().DisplaySize.y);
+           break;
+         case 2:
+           window_size = ImVec2(24,ImGui::GetIO().DisplaySize.y);
+           p_min = ImVec2(ImGui::GetIO().DisplaySize.x-window_size.x,0);
+           main_window_pos=p_min;
+           p_max = ImVec2(ImGui::GetIO().DisplaySize.x,ImGui::GetIO().DisplaySize.y);
+           break;
+         case 3:
+           window_size = ImVec2(ImGui::GetIO().DisplaySize.x,window_size.x);
+           p_min = ImVec2(0,0);
+           main_window_pos=p_min;
+           p_max = ImVec2(ImGui::GetIO().DisplaySize.x,window_size.y);
+           break;
+         }
+       ImGui::SetNextWindowPos(main_window_pos, ImGuiCond_Always);
+       ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0,0));
+       ImGui::SetNextWindowSize(window_size);
+       ImGui::Begin("FCAT", &fcat_open, ImGuiWindowFlags_NoDecoration| ImGuiWindowFlags_NoBackground);
+       ImGui::GetWindowDrawList()->AddRectFilled(p_min,p_max,fcatstatus.sequence[fcatstatus.currentColor%16],0.0);
+       fcatstatus.currentColor++;
+       //fcatstatus.currentColor %= 16;
+       ImGui::End();
+       ImGui::PopStyleVar();
+     }
 }
 
 void init_cpu_stats(overlay_params& params)
