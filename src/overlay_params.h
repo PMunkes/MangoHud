@@ -82,6 +82,7 @@ typedef unsigned long KeySym;
    OVERLAY_PARAM_BOOL(gamepad_battery_icon)          \
    OVERLAY_PARAM_BOOL(hide_fsr_sharpness)            \
    OVERLAY_PARAM_BOOL(fan)                           \
+   OVERLAY_PARAM_BOOL(fcat)                          \
    OVERLAY_PARAM_CUSTOM(fps_sampling_period)         \
    OVERLAY_PARAM_CUSTOM(output_folder)               \
    OVERLAY_PARAM_CUSTOM(output_file)                 \
@@ -151,6 +152,8 @@ typedef unsigned long KeySym;
    OVERLAY_PARAM_CUSTOM(autostart_log)               \
    OVERLAY_PARAM_CUSTOM(round_corners)               \
    OVERLAY_PARAM_CUSTOM(fsr_steam_sharpness)         \
+   OVERLAY_PARAM_CUSTOM(fcat_screen_edge)            \
+   OVERLAY_PARAM_CUSTOM(fcat_overlay_width)          \
 
 enum overlay_param_position {
    LAYER_POSITION_TOP_LEFT,
@@ -224,6 +227,7 @@ struct overlay_params {
    unsigned media_player_color;
    unsigned table_columns;
    bool no_small_font;
+   bool fcat;
    float font_size, font_scale;
    float font_size_text;
    float font_scale_media_player;
@@ -251,6 +255,8 @@ struct overlay_params {
    std::unordered_map<std::string,std::string> options;
    int permit_upload;
    int fsr_steam_sharpness;
+   unsigned short fcat_screen_edge;
+   unsigned short fcat_overlay_width;
 
    size_t font_params_hash;
 };
