@@ -38,6 +38,7 @@ float g_overflow = 50.f /* 3333ms * 0.5 / 16.6667 / 2 (to edge and back) */;
 string gpuString,wineVersion,wineProcess;
 int32_t deviceID;
 bool gui_open = false;
+bool fcat_open = false;
 struct benchmark_stats benchmark;
 struct fps_limit fps_limit_stats {};
 ImVec2 real_font_size;
@@ -562,7 +563,7 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
        auto p_max = ImVec2(window_size.x,ImGui::GetIO().DisplaySize.y);
       //Switch the used screen edge, this enables capture from devices with any screen orientation.
       //This goes counter-clockwise from the left edge (0) 
-       switch (fcatstatus.landscape_orientation)
+       switch (fcatstatus.screen_edge)
          {
          default:
          case 0:
